@@ -1,101 +1,538 @@
-# Intelligent Healthcare Disease Risk Prediction & Clinical Decision Support System
+# 🩺 Intelligent Healthcare Disease Risk Prediction
 
-Educational final-year project based directly on the supplied project specification.
+An explainable machine-learning based healthcare risk prediction system built using Python, Scikit-learn, FastAPI, Streamlit and SHAP.
 
-## Scope
-This system predicts diabetes risk from the Pima Indians Diabetes dataset, exposes a FastAPI prediction service, and provides a Streamlit decision-support dashboard.
+> **Important:** This project is intended for educational and research purposes. It is a machine-learning risk estimation system and is **not a medical diagnosis tool**.
 
-**Important:** This is an educational decision-support system, not a medical diagnosis tool.
+---
 
-## PDF requirement mapping
+## 📌 Project Overview
 
-| PDF requirement | Implementation |
-|---|---|
-| Supervised classification | Binary diabetes-risk classification |
-| Data cleaning | Duplicate checks + invalid-zero-to-missing handling |
-| Missing values | SimpleImputer |
-| Outlier analysis | IQR summary/report |
-| Feature engineering | BMI Category, Age Group, Risk Factor Count |
-| Encoding/scaling | OneHotEncoder + StandardScaler |
-| Class imbalance | SMOTE on training data |
-| Models | Logistic Regression, Decision Tree, Random Forest, Gradient Boosting, SVM, optional XGBoost |
-| Tuning | GridSearchCV |
-| Evaluation | Accuracy, Precision, Recall, F1, ROC-AUC, Sensitivity, Specificity |
-| Model extraction | `models/disease_pipeline.pkl` |
-| Backend | FastAPI `/health`, `/model-info`, `/predict`, `/batch-predict` |
-| Frontend | Streamlit dashboard, individual prediction, analytics, evaluation |
-| Explainability | Feature importance + SHAP-ready architecture |
-| Batch prediction | API endpoint and CSV-ready structure |
-| Documentation | README, architecture and methodology |
+This project predicts diabetes-related disease risk from structured patient health information.
 
-## Dataset
+The system provides:
 
-Use the Pima Indians Diabetes CSV with:
+* Individual risk prediction
+* Probability of predicted risk
+* LOW / MEDIUM / HIGH application-level risk category
+* Batch prediction using CSV files
+* SHAP-based explainability
+* Population analytics
+* Model evaluation
+* ROC and Precision-Recall curves
+* Model comparison
+* Interactive Streamlit dashboard
+* REST API using FastAPI
 
-`Pregnancies, Glucose, BloodPressure, SkinThickness, Insulin, BMI, DiabetesPedigreeFunction, Age, Outcome`
+---
 
-The dataset is intentionally not committed to Git by default. Download it with:
+## 🏗️ System Architecture
+
+```text
+                    Patient Input
+                         │
+                         ▼
+                 ┌───────────────┐
+                 │   Streamlit   │
+                 │   Frontend    │
+                 └───────┬───────┘
+                         │
+                         ▼
+                 ┌───────────────┐
+                 │    FastAPI    │
+                 │      API      │
+                 └───────┬───────┘
+                         │
+                         ▼
+              ┌──────────────────────┐
+              │ Feature Engineering  │
+              └──────────┬───────────┘
+                         │
+                         ▼
+              ┌──────────────────────┐
+              │ Preprocessing + SMOTE│
+              └──────────┬───────────┘
+                         │
+                         ▼
+                 ┌───────────────┐
+                 │   SVM Model   │
+                 └───────┬───────┘
+                         │
+              ┌──────────┴──────────┐
+              ▼                     ▼
+        Prediction              Probability
+              │                     │
+              └──────────┬──────────┘
+                         ▼
+                    Risk Level
+                         │
+                         ▼
+                 SHAP Explanation
+```
+
+---
+
+## 📂 Project Structure
+
+```text
+health-risk-prediction/
+│
+├── backend/
+│   ├── app.py
+│   ├── predictor.py
+│   └── schemas.py
+│
+├── data/
+│   └── diabetes.csv
+│
+├── frontend/
+│   └── streamlit_app.py
+│
+├── models/
+│   ├── disease_pipeline.pkl
+│   └── model_metadata.json
+│
+├── notebooks/
+│
+├── outputs/
+│   ├── eda_summary.json
+│   ├── feature_importance.csv
+│   ├── model_comparison.csv
+│   ├── pr_curve.csv
+│   ├── roc_curve.csv
+│   ├── shap_background.csv
+│   └── test_predictions.csv
+│
+├── training/
+│   ├── download_dataset.py
+│   ├── preprocessing.py
+│   └── train.py
+│
+├── requirements.txt
+├── README.md
+└── .gitignore
+```
+
+---
+
+# 🚀 Installation
+
+## 1. Clone the repository
 
 ```bash
+git clone https://github.com/DarkNetNinja/health-risk-prediction.git
+```
+
+Then:
+
+```bash
+cd health-risk-prediction
+```
+
+---
+
+## 2. Create a virtual environment
+
+### Windows
+
+```powershell
+python -m venv .venv
+```
+
+Activate it:
+
+```powershell
+.venv\Scripts\Activate.ps1
+```
+
+If PowerShell blocks activation, run:
+
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
+Then:
+
+```powershell
+.venv\Scripts\Activate.ps1
+```
+
+---
+
+## 3. Install dependencies
+
+```powershell
+pip install -r requirements.txt
+```
+
+---
+
+# 🧠 Model Training
+
+The repository already contains the trained model artifacts.
+
+If you want to retrain the project from the dataset:
+
+```powershell
 python training/download_dataset.py
 ```
 
-The script uses the public dataset copy referenced in the project documentation.
+Then:
 
-## Setup
-
-### Windows
 ```powershell
-python -m venv .venv
-.venv\Scripts\activate
-pip install -r requirements.txt
-python training/download_dataset.py
 python training/train.py
 ```
 
-### Start backend
+This generates the model and evaluation artifacts.
+
+---
+
+# ⚡ Run the FastAPI Backend
+
+From the project root:
+
 ```powershell
 uvicorn backend.app:app --reload
 ```
 
-Swagger: `http://127.0.0.1:8000/docs`
+The API will run at:
 
-### Start frontend
-In another terminal:
+```text
+http://127.0.0.1:8000
+```
+
+FastAPI documentation:
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+---
+
+## 🔌 API Endpoints
+
+### Health Check
+
+```text
+GET /health
+```
+
+Example response:
+
+```json
+{
+  "status": "healthy",
+  "model": "SVM"
+}
+```
+
+### Model Information
+
+```text
+GET /model-info
+```
+
+Returns:
+
+* selected model
+* features
+* evaluation metrics
+* risk bands
+
+### Individual Prediction
+
+```text
+POST /predict
+```
+
+Example input:
+
+```json
+{
+  "pregnancies": 2,
+  "glucose": 120,
+  "blood_pressure": 70,
+  "skin_thickness": 25,
+  "insulin": 100,
+  "bmi": 28.5,
+  "diabetes_pedigree_function": 0.35,
+  "age": 30
+}
+```
+
+Example response:
+
+```json
+{
+  "prediction": 0,
+  "probability": 0.42908175019048794,
+  "risk_level": "MEDIUM"
+}
+```
+
+### Batch Prediction
+
+```text
+POST /batch-predict
+```
+
+The Streamlit application can upload a CSV and send multiple patient records to this endpoint.
+
+### Explainable Prediction
+
+```text
+POST /explain
+```
+
+Uses SHAP PermutationExplainer to provide feature-level explanations for the model prediction.
+
+---
+
+# 🖥️ Run the Streamlit Frontend
+
+Keep FastAPI running.
+
+Open a **second terminal**.
+
+Activate the environment:
+
+```powershell
+.venv\Scripts\Activate.ps1
+```
+
+Run:
+
 ```powershell
 streamlit run frontend/streamlit_app.py
 ```
 
-## Team workflow
+The application will open at:
 
-```bash
-git clone <YOUR_REPOSITORY_URL>
-cd health-risk-prediction
-git checkout -b feature/backend
-git add .
-git commit -m "Add backend prediction service"
-git push -u origin feature/backend
+```text
+http://localhost:8501
 ```
 
-Use separate branches for preprocessing, ML, backend, frontend, and documentation, then merge through Pull Requests.
+---
 
-## Presentation flow
+# 📊 Streamlit Features
 
-1. Problem statement
-2. Proposed solution
-3. Dataset and features
-4. ML pipeline
-5. Feature engineering
-6. Model comparison
-7. Evaluation metrics and false-positive/false-negative trade-off
-8. System architecture
-9. Live prediction
-10. Explainability
-11. Population analytics / batch prediction
-12. Limitations and future scope
+## Project Dashboard
 
-## Limitations
-- The chosen public dataset is small and population-specific.
-- Some physiological missing values are represented by zero and need preprocessing.
-- The dataset does not contain every example feature listed in the PDF, such as smoking, diet, family history and gender.
-- Risk bands in the application are probability bands for demonstration, not clinical diagnostic thresholds.
+Displays:
+
+* Evaluation records
+* Positive cases
+* Average predicted risk
+* High-risk predictions
+* Selected model
+* Model comparison
+
+## Individual Risk Prediction
+
+Enter patient information and receive:
+
+* Prediction
+* Probability
+* Risk category
+
+## Explainable Prediction
+
+Uses SHAP to show factors that increase or decrease the predicted probability.
+
+## Batch Prediction
+
+Upload a CSV containing:
+
+```text
+patient_id
+Pregnancies
+Glucose
+BloodPressure
+SkinThickness
+Insulin
+BMI
+DiabetesPedigreeFunction
+Age
+```
+
+Example:
+
+```csv
+patient_id,Pregnancies,Glucose,BloodPressure,SkinThickness,Insulin,BMI,DiabetesPedigreeFunction,Age
+P001,2,120,70,25,100,28.5,0.35,30
+P002,5,150,80,30,150,32.1,0.50,45
+P003,1,90,60,20,80,24.5,0.20,25
+```
+
+The application generates predictions and allows downloading the results as CSV.
+
+## Population Analytics
+
+Displays:
+
+* Predicted risk distribution
+* Actual disease distribution
+
+## Model Evaluation
+
+Displays:
+
+* Accuracy
+* Precision
+* Recall
+* F1 Score
+* ROC-AUC
+* Sensitivity
+* Specificity
+* ROC curve
+* Precision-Recall curve
+* Feature importance
+
+---
+
+# 🤖 Machine Learning Pipeline
+
+The project evaluates multiple classification algorithms:
+
+* Logistic Regression
+* Decision Tree
+* Random Forest
+* Gradient Boosting
+* Support Vector Machine
+* XGBoost
+
+The training pipeline includes:
+
+```text
+Data Cleaning
+     ↓
+Missing Value Handling
+     ↓
+Feature Engineering
+     ↓
+Categorical Encoding
+     ↓
+Feature Scaling
+     ↓
+Train/Test Split
+     ↓
+SMOTE
+     ↓
+Model Training
+     ↓
+Hyperparameter Tuning
+     ↓
+Cross Validation
+     ↓
+Model Comparison
+     ↓
+Final Model
+```
+
+The final model in the current trained artifacts is **SVM**, selected based on the highest ROC-AUC among the evaluated models.
+
+---
+
+# 🧪 Evaluation
+
+The current trained model achieves approximately:
+
+| Metric      |    SVM |
+| ----------- | -----: |
+| Accuracy    | 74.68% |
+| Precision   | 62.30% |
+| Recall      | 70.37% |
+| F1          | 66.09% |
+| ROC-AUC     | 82.85% |
+| Sensitivity | 70.37% |
+| Specificity | 77.00% |
+
+These values are based on the project's held-out test set.
+
+---
+
+# 🧩 Feature Engineering
+
+Additional features are generated from the original patient inputs:
+
+* BMI Category
+* Age Group
+* Risk Factor Count
+
+The application automatically generates these features before prediction.
+
+---
+
+# ⚠️ Risk Categories
+
+The application uses probability-based application categories:
+
+```text
+0% – <33%     LOW
+33% – <66%    MEDIUM
+66% – 100%    HIGH
+```
+
+These are **application-level probability bands and are not clinical diagnostic thresholds**.
+
+---
+
+# 🛠️ Technologies Used
+
+* Python
+* Pandas
+* NumPy
+* Scikit-learn
+* Imbalanced-learn
+* XGBoost
+* SHAP
+* FastAPI
+* Uvicorn
+* Pydantic
+* Streamlit
+* Plotly
+* Joblib
+
+---
+
+# 👥 Team Setup
+
+Each team member should:
+
+1. Clone the repository
+2. Create a virtual environment
+3. Install requirements
+4. Start FastAPI
+5. Start Streamlit
+
+### Terminal 1
+
+```powershell
+cd health-risk-prediction
+.venv\Scripts\Activate.ps1
+uvicorn backend.app:app --reload
+```
+
+### Terminal 2
+
+```powershell
+cd health-risk-prediction
+.venv\Scripts\Activate.ps1
+streamlit run frontend/streamlit_app.py
+```
+
+Then open:
+
+```text
+http://localhost:8501
+```
+
+---
+
+# 🩺 Disclaimer
+
+This project is developed for educational, academic and research purposes.
+
+It should not be used as a substitute for professional medical advice, diagnosis, or treatment.
+
+Model predictions represent machine-learning estimates based on the training dataset and should not be interpreted as clinical conclusions.
