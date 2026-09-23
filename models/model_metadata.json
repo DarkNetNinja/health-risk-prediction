@@ -1,0 +1,42 @@
+{
+  "best_model": "SVM",
+  "feature_columns": [
+    "Pregnancies",
+    "Glucose",
+    "BloodPressure",
+    "SkinThickness",
+    "Insulin",
+    "BMI",
+    "DiabetesPedigreeFunction",
+    "Age",
+    "BMI_Category",
+    "Age_Group",
+    "Risk_Factor_Count"
+  ],
+  "target": "Outcome",
+  "test_metrics": {
+    "Model": "SVM",
+    "Accuracy": 0.7467532467532467,
+    "Precision": 0.6229508196721312,
+    "Recall": 0.7037037037037037,
+    "F1": 0.6608695652173913,
+    "ROC_AUC": 0.8285185185185185,
+    "Sensitivity": 0.7037037037037037,
+    "Specificity": 0.77
+  },
+  "risk_bands": {
+    "LOW": [
+      0,
+      0.33
+    ],
+    "MEDIUM": [
+      0.33,
+      0.66
+    ],
+    "HIGH": [
+      0.66,
+      1
+    ]
+  },
+  "note": "Risk bands are application-level probability bands, not clinical diagnostic thresholds."
+}

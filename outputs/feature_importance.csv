@@ -1,0 +1,17 @@
+Feature,Importance
+num__Glucose,0.9126785829583369
+cat__Age_Group_Young,0.6678279411004509
+cat__BMI_Category_Obese,0.49760297818369725
+cat__BMI_Category_Normal,0.4865284194165578
+cat__Age_Group_Middle_Age,0.4334875512834033
+num__BMI,0.42125439425713657
+num__DiabetesPedigreeFunction,0.29807803213431905
+cat__Age_Group_Senior,0.23434038981704575
+num__SkinThickness,0.14544807434286122
+num__Pregnancies,0.10859843374252531
+num__Insulin,0.09565321126417436
+num__Risk_Factor_Count,0.07162464269543262
+num__Age,0.05802071007057269
+num__BloodPressure,0.02621185573465956
+cat__BMI_Category_Overweight,0.011074558767132148
+cat__BMI_Category_Underweight,0.0
